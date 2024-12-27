@@ -2,6 +2,8 @@ import os
 import yt_dlp
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 ydl_opts = {
     'format': 'bestaudio/best',
@@ -31,10 +33,14 @@ while itteration < max_itteration:
         text_file_path = os.path.join(song_folder, f'{song_name}.txt')
         with open(text_file_path, 'w', encoding='utf-8') as text_file:
             text_file.write(song_lyrics)
+        
+        video_link_element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, 'div.ytp-title-text a')))
+
+        video_link = video_link_element.get_attribute('href')
 
         ydl_opts['outtmpl'] = os.path.join(song_folder, f'{song_name}.mp3')
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([link])
+            ydl.download([video_link])
 
         itteration += 1
 
